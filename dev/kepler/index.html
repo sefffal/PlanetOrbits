@@ -2,98 +2,98 @@
 <html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Kepler Solvers · PlanetOrbits.jl</title><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../"><img src="../assets/logo.svg" alt="PlanetOrbits.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../">PlanetOrbits.jl</a></span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><span class="tocitem">Tutorials</span><ul><li><a class="tocitem" href="../introduction/">Introduction</a></li><li><a class="tocitem" href="../plots/">Plotting</a></li><li><a class="tocitem" href="../image-warping/">Image Warping</a></li></ul></li><li><span class="tocitem">Documentation</span><ul><li><a class="tocitem" href="../api/">API</a></li><li><a class="tocitem" href="../conventions/">Conventions</a></li><li class="is-active"><a class="tocitem" href>Kepler Solvers</a><ul class="internal"><li><a class="tocitem" href="#Examples"><span>Examples</span></a></li><li><a class="tocitem" href="#High-precision"><span>High precision</span></a></li><li><a class="tocitem" href="#Comparison"><span>Comparison</span></a></li></ul></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Documentation</a></li><li class="is-active"><a href>Kepler Solvers</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Kepler Solvers</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/sefffal/PlanetOrbits.jl/blob/master/docs/src/kepler.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Kepler-Solvers"><a class="docs-heading-anchor" href="#Kepler-Solvers">Kepler Solvers</a><a id="Kepler-Solvers-1"></a><a class="docs-heading-anchor-permalink" href="#Kepler-Solvers" title="Permalink"></a></h1><p>The heart of this package is being able to take a set of Keplerian elements and output relative positions, velocities, etc.</p><p>This normaly requires solving Kepler&#39;s equation numerically. This package supports a multitude of solver algorithms that can be passed to <a href="../api/#PlanetOrbits.orbitsolve"><code>orbitsolve</code></a>:</p><ul><li><a href="../api/#PlanetOrbits.Auto"><code>PlanetOrbits.Auto</code></a></li><li><a href="../api/#PlanetOrbits.Markley"><code>PlanetOrbits.Markley</code></a></li><li><a href="../api/#PlanetOrbits.Goat"><code>PlanetOrbits.Goat</code></a></li><li><a href="../api/#PlanetOrbits.RootsMethod"><code>PlanetOrbits.RootsMethod</code></a></li></ul><p>The last of these <code>RootsMethod</code>, allows one to substitute any algorithm from the Roots.jl package. These include many different classical and modern root finding algorithms.chosen precision, including artibrary precision BigFloats. Using big floats with, for example, <code>Roots.PlanetOrbits.Thukral5B</code> and a tight tolerenace, allows you to solve orbits up to arbitrary precision.</p><p>The default choice is <code>Auto</code>, which currently selects <code>Markley</code> for all cases. The Markley algorithm is very fast, reasonably accurate, and always converges, making it a good default choice.</p><p>The Markley algorithm is a tweaked version of the algorithm from <a href="http://juliaastro.github.io/AstroLib.jl/stable/ref/#AstroLib.kepler_solver">AstroLib.jl</a>. It is non-iterative and converges with less than 1e-15 relative error across the full range of e between 0 and 1. On my laptop, this solves for a single eccentric anomaly in just 71 ns. Since it is implemented in pure Julia, there is no overhead from calling into a C or Cython compiled function and no need for vectorization.</p><h2 id="Examples"><a class="docs-heading-anchor" href="#Examples">Examples</a><a id="Examples-1"></a><a class="docs-heading-anchor-permalink" href="#Examples" title="Permalink"></a></h2><pre><code class="language-julia hljs">using PlanetOrbits, BenchmarkTools
 orb = orbit(a=1.2, e=0.1, M=1.0, ω=1.4, τ=0.5)
 t = mjd(&quot;2025-06-23&quot;)
-@benchmark orbitsolve(orb, t, PlanetOrbits.Markley())</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 10000 samples with 254 evaluations.
- Range (min … max):  301.185 ns …  10.633 μs  ┊ GC (min … max): 0.00% … 96.46%
- Time  (median):     327.169 ns               ┊ GC (median):    0.00%
- Time  (mean ± σ):   341.138 ns ± 203.989 ns  ┊ GC (mean ± σ):  1.18% ±  1.93%
+@benchmark orbitsolve(orb, t, PlanetOrbits.Markley())</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 10000 samples with 251 evaluations.
+ Range (min … max):  300.781 ns …   8.078 μs  ┊ GC (min … max): 0.00% … 94.99%
+ Time  (median):     303.964 ns               ┊ GC (median):    0.00%
+ Time  (mean ± σ):   316.791 ns ± 184.503 ns  ┊ GC (mean ± σ):  1.40% ±  2.32%
 
-  ▄▃▁           ▇█▆▃                                ▁▃▃▂▃▃▂▁▁   ▂
-  ███▆▃▃▃▄▃▃▁▃▁▃█████▇▇▇█▆▅▅▃▃▅▆▆▅▇▇████▇▇▆▆▆▇▆▇▆▇▇▇███████████ █
-  301 ns        Histogram: log(frequency) by time        405 ns &lt;
+  ▂███▆▄▃▁                                       ▂▂▃▂▃▃▂▃▂▂▁▁▁  ▂
+  ██████████▇▇▆▆▄▃▃▁▃▃▁▁▁▁▁▃▄▃▅▇▇██▇▆▅▅▅▄▅▄███▇▆███████████████ █
+  301 ns        Histogram: log(frequency) by time        364 ns &lt;
 
- Memory estimate: 112 bytes, allocs estimate: 1.</code></pre><pre><code class="language-julia hljs">@benchmark orbitsolve(orb, t, PlanetOrbits.Goat())</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 10000 samples with 21 evaluations.
- Range (min … max):  952.381 ns …  2.457 μs  ┊ GC (min … max): 0.00% … 0.00%
- Time  (median):       1.138 μs              ┊ GC (median):    0.00%
- Time  (mean ± σ):     1.106 μs ± 83.083 ns  ┊ GC (mean ± σ):  0.00% ± 0.00%
+ Memory estimate: 112 bytes, allocs estimate: 1.</code></pre><pre><code class="language-julia hljs">@benchmark orbitsolve(orb, t, PlanetOrbits.Goat())</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 10000 samples with 12 evaluations.
+ Range (min … max):  983.250 ns …  2.650 μs  ┊ GC (min … max): 0.00% … 0.00%
+ Time  (median):       1.000 μs              ┊ GC (median):    0.00%
+ Time  (mean ± σ):     1.044 μs ± 84.321 ns  ┊ GC (mean ± σ):  0.00% ± 0.00%
 
-   ▁           █▇▅▄▂▁▂         ▃▆▆▆▇▄▃▃   ▁▂▁▂                 ▂
-  ███▇▄▃▄▄▃▃▁▁█████████▆▅▅▄▃▄▄▄█████████▇█████▇▇█▇▇██▅▇▇▅▅▆▅▃▅ █
-  952 ns        Histogram: log(frequency) by time      1.32 μs &lt;
-
- Memory estimate: 112 bytes, allocs estimate: 1.</code></pre><pre><code class="language-julia hljs">using Roots
-@benchmark orbitsolve(orb, t, PlanetOrbits.RootsMethod(Roots.Newton()))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 10000 samples with 202 evaluations.
- Range (min … max):  383.668 ns …  14.541 μs  ┊ GC (min … max): 0.00% … 96.21%
- Time  (median):     417.337 ns               ┊ GC (median):    0.00%
- Time  (mean ± σ):   435.705 ns ± 280.867 ns  ┊ GC (mean ± σ):  1.27% ±  1.93%
-
-  ▃▄▁           ▅█▆▃▂▂▂▂▁                 ▂▃▃▁▂▂▃▃▂▂▂▂          ▂
-  ███▇▆▆▇▇▄▃▁▃▁▁██████████▇▆▇▅▆▇▇▆▆▇▇▇▇▇▇████████████████▇▆▆▄▆▆ █
-  384 ns        Histogram: log(frequency) by time        514 ns &lt;
+   ▇ █ ▅▂                       ▄ ▆ ▅ ▃▃ ▂ ▁           ▁       ▂
+  ▆█▁█▁██▁█▁█▁▇█▁█▁▆▆▁▇▁▆▁▁▄▁▄▁▆█▁█▁█▅██▁█▁█▇▁▅▁▄▁▃▅▁█▁██▁█▁▇▄ █
+  983 ns        Histogram: log(frequency) by time      1.28 μs &lt;
 
  Memory estimate: 112 bytes, allocs estimate: 1.</code></pre><pre><code class="language-julia hljs">using Roots
-@benchmark orbitsolve(orb, t, PlanetOrbits.RootsMethod(Roots.Thukral3B()))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 10000 samples with 198 evaluations.
- Range (min … max):  437.884 ns …  14.983 μs  ┊ GC (min … max): 0.00% … 95.90%
- Time  (median):     478.793 ns               ┊ GC (median):    0.00%
- Time  (mean ± σ):   500.616 ns ± 322.812 ns  ┊ GC (mean ± σ):  1.42% ±  2.14%
+@benchmark orbitsolve(orb, t, PlanetOrbits.RootsMethod(Roots.Newton()))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 10000 samples with 211 evaluations.
+ Range (min … max):  357.820 ns …  10.319 μs  ┊ GC (min … max): 0.00% … 95.11%
+ Time  (median):     363.502 ns               ┊ GC (median):    0.00%
+ Time  (mean ± σ):   378.932 ns ± 219.302 ns  ┊ GC (mean ± σ):  1.27% ±  2.13%
 
-                   ▄█▇▅▁▁▂▃▄▃▂▁               ▁▄▃▂▂▂▃▃▂▂▂▂▁     ▂
-  ▅█▇▆▃▃▁▃▃▃▃▁▁▁▁▁▁█████████████▇▆▅▆▅▆▄▆▇▇█▇▇▇██████████████▇▇▇ █
-  438 ns        Histogram: log(frequency) by time        567 ns &lt;
+   ▃▆█▇▆▅▂▁       ▂▂▃▃▃▃▂▂             ▁  ▁  ▁▃▂▃▃▂▁▃▃▂▁▁       ▂
+  ▇███████████████████████▇▆▅▅▄▅▄▄▄▂▄▆▇████▆████████████████▇▇▇ █
+  358 ns        Histogram: log(frequency) by time        424 ns &lt;
+
+ Memory estimate: 112 bytes, allocs estimate: 1.</code></pre><pre><code class="language-julia hljs">using Roots
+@benchmark orbitsolve(orb, t, PlanetOrbits.RootsMethod(Roots.Thukral3B()))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 10000 samples with 200 evaluations.
+ Range (min … max):  407.500 ns …  10.972 μs  ┊ GC (min … max): 0.00% … 95.39%
+ Time  (median):     414.000 ns               ┊ GC (median):    0.00%
+ Time  (mean ± σ):   430.614 ns ± 233.675 ns  ┊ GC (mean ± σ):  1.19% ±  2.12%
+
+    ▂▇█▇▆▄▁     ▁▁▂▄▃▃▃▄▂▁             ▂▂▃▁▁▁▃▂▂▃▂▁▁▂▂▁▂        ▂
+  ▅▇███████▇█▇██████████████▅▄▄▃▃▄▆▆▅▇████████████████████▆▇▆▆▇ █
+  408 ns        Histogram: log(frequency) by time        477 ns &lt;
 
  Memory estimate: 112 bytes, allocs estimate: 1.</code></pre><pre><code class="language-julia hljs">@benchmark orbitsolve(orb, t, PlanetOrbits.RootsMethod(Roots.A42()))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 10000 samples with 9 evaluations.
- Range (min … max):  2.256 μs …   6.100 μs  ┊ GC (min … max): 0.00% … 0.00%
- Time  (median):     2.456 μs               ┊ GC (median):    0.00%
- Time  (mean ± σ):   2.509 μs ± 174.566 ns  ┊ GC (mean ± σ):  0.00% ± 0.00%
+ Range (min … max):  2.211 μs …   4.822 μs  ┊ GC (min … max): 0.00% … 0.00%
+ Time  (median):     2.233 μs               ┊ GC (median):    0.00%
+ Time  (mean ± σ):   2.274 μs ± 106.707 ns  ┊ GC (mean ± σ):  0.00% ± 0.00%
 
-  ▃▂           ▃█▅▃▁▁▂             ▃▄▃▂▁                      ▁
-  ██▇▅▅▃▁▁▃▁▁▁▁████████▇▆▅▇▄▁▄▁▅▅▅████████▅▅▁▅█▇▇▅▆▆▄▅▅▅▆▅▄▄▄ █
-  2.26 μs      Histogram: log(frequency) by time      3.04 μs &lt;
+  ▄█ █▅ ▂ ▁▁ ▁                 ▃ ▅▄ ▃ ▃▁                      ▂
+  ██▁██▁█▁██▁█▁██▁▇▁▆▄▁▅▅▁▄▁▃▇▁█▁██▁█▁██▁██▁▇▁▅▄▁▆▁██▁▇▁▇▅▁▆▅ █
+  2.21 μs      Histogram: log(frequency) by time      2.61 μs &lt;
 
  Memory estimate: 112 bytes, allocs estimate: 1.</code></pre><pre><code class="language-julia hljs">@benchmark orbitsolve(orb, t, PlanetOrbits.RootsMethod(Roots.Bisection()))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 10000 samples with 10 evaluations.
- Range (min … max):  1.720 μs …   4.600 μs  ┊ GC (min … max): 0.00% … 0.00%
- Time  (median):     1.910 μs               ┊ GC (median):    0.00%
- Time  (mean ± σ):   1.967 μs ± 141.804 ns  ┊ GC (mean ± σ):  0.00% ± 0.00%
+ Range (min … max):  1.430 μs …  4.190 μs  ┊ GC (min … max): 0.00% … 0.00%
+ Time  (median):     1.440 μs              ┊ GC (median):    0.00%
+ Time  (mean ± σ):   1.487 μs ± 95.731 ns  ┊ GC (mean ± σ):  0.00% ± 0.00%
 
-     ▁         ▂▁▅█▇▆▆▃▁▁             ▂▄▅▅▃▂▁      ▁          ▂
-  ▅▆▆██▇▇▁▁▁▁▁█████████████▇▇▅▅▅▃▄▃▅▇█████████▆▆▃▄▆██▇▇▇▅▅▅▆▆ █
-  1.72 μs      Histogram: log(frequency) by time      2.37 μs &lt;
+  ▅█ ▇▄ ▁ ▁                    ▄ ▅ ▄▃ ▂ ▁              ▁     ▂
+  ██▁██▁█▁██▁█▁██▁▆▁▇▅▁▅▁▁▃▁▃▁▇█▁█▁██▁█▁██▁▇▁▅▅▁▃▁▃▆▁█▁█▇▁▇▄ █
+  1.43 μs      Histogram: log(frequency) by time     1.78 μs &lt;
 
- Memory estimate: 112 bytes, allocs estimate: 1.</code></pre><pre><code class="language-julia hljs">@benchmark orbitsolve(orb, t, PlanetOrbits.RootsMethod(Roots.SuperHalley()))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 10000 samples with 203 evaluations.
- Range (min … max):  375.374 ns …  14.840 μs  ┊ GC (min … max): 0.00% … 96.68%
- Time  (median):     408.872 ns               ┊ GC (median):    0.00%
- Time  (mean ± σ):   427.337 ns ± 285.036 ns  ┊ GC (mean ± σ):  1.32% ±  1.93%
+ Memory estimate: 112 bytes, allocs estimate: 1.</code></pre><pre><code class="language-julia hljs">@benchmark orbitsolve(orb, t, PlanetOrbits.RootsMethod(Roots.SuperHalley()))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 10000 samples with 208 evaluations.
+ Range (min … max):  363.942 ns …  10.919 μs  ┊ GC (min … max): 0.00% … 94.79%
+ Time  (median):     369.712 ns               ┊ GC (median):    0.00%
+ Time  (mean ± σ):   385.842 ns ± 234.598 ns  ┊ GC (mean ± σ):  1.34% ±  2.13%
 
-  ▁▄▂            ▂██▅▃▁▁▂▃▃▃▂                 ▁▃▃▁▂▂▂▃▃▂▃▃▂▂▁   ▂
-  ███▇▆▅▆▇▇▇▆▄▃▃▁█████████████▆▆▆▄▅▅▅▆▅▆▆▇▇█▇█████████████████▇ █
-  375 ns        Histogram: log(frequency) by time        493 ns &lt;
+  ▁▃▇███▅▃▂▁ ▁  ▂▂▂▄▃▄▄▂▂▁             ▂▂▂▂ ▁▂▃▃▄▃▂▃▂▂▃▂▁▂ ▁▁   ▃
+  ████████████████████████▇▆▇▄▅▄▄▄▅▁▅▆███████████████████████▇▇ █
+  364 ns        Histogram: log(frequency) by time        433 ns &lt;
 
- Memory estimate: 112 bytes, allocs estimate: 1.</code></pre><pre><code class="language-julia hljs">@benchmark orbitsolve(orb, t, PlanetOrbits.RootsMethod(Roots.Brent()))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 10000 samples with 69 evaluations.
- Range (min … max):  789.870 ns …  1.687 μs  ┊ GC (min … max): 0.00% … 0.00%
- Time  (median):     865.232 ns              ┊ GC (median):    0.00%
- Time  (mean ± σ):   886.156 ns ± 62.141 ns  ┊ GC (mean ± σ):  0.00% ± 0.00%
+ Memory estimate: 112 bytes, allocs estimate: 1.</code></pre><pre><code class="language-julia hljs">@benchmark orbitsolve(orb, t, PlanetOrbits.RootsMethod(Roots.Brent()))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 10000 samples with 115 evaluations.
+ Range (min … max):  750.435 ns …  20.663 μs  ┊ GC (min … max): 0.00% … 95.79%
+ Time  (median):     765.217 ns               ┊ GC (median):    0.00%
+ Time  (mean ± σ):   784.252 ns ± 340.879 ns  ┊ GC (mean ± σ):  0.74% ±  1.65%
 
-   ▆▄▁▁ ▁▁   ▂▆█▄▄▄▂▃▂   ▃▆▅▄▂▃▂▁▁                             ▂
-  ▄████▇██▆▄▇██████████▇████████████▇▆▆▇▅▆▆▆▇▆▆▆▆▆▆▇▆▇▆▅▅▆▆▅▆▅ █
-  790 ns        Histogram: log(frequency) by time      1.12 μs &lt;
+     ▁▆▁█▅▂                                                      
+  ▂▃▄██████▇▃▄▃▃▄▃▄▅▄▄▃▃▃▂▂▂▂▃▄▅▅█▆▅▃▃▃▄▄▅▃▄▃▃▃▂▃▂▃▂▂▂▂▂▂▁▂▂▂▂▂ ▃
+  750 ns           Histogram: frequency by time          846 ns &lt;
 
- Memory estimate: 112 bytes, allocs estimate: 1.</code></pre><pre><code class="language-julia hljs">@benchmark orbitsolve(orb, t, PlanetOrbits.RootsMethod(Roots.Order2()))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 10000 samples with 190 evaluations.
- Range (min … max):  484.742 ns …  16.028 μs  ┊ GC (min … max): 0.00% … 96.11%
- Time  (median):     527.379 ns               ┊ GC (median):    0.00%
- Time  (mean ± σ):   538.963 ns ± 266.477 ns  ┊ GC (mean ± σ):  0.84% ±  1.66%
+ Memory estimate: 112 bytes, allocs estimate: 1.</code></pre><pre><code class="language-julia hljs">@benchmark orbitsolve(orb, t, PlanetOrbits.RootsMethod(Roots.Order2()))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 10000 samples with 196 evaluations.
+ Range (min … max):  482.653 ns …  11.867 μs  ┊ GC (min … max): 0.00% … 94.06%
+ Time  (median):     488.265 ns               ┊ GC (median):    0.00%
+ Time  (mean ± σ):   505.645 ns ± 251.140 ns  ┊ GC (mean ± σ):  1.09% ±  2.12%
 
-  ▄▇▄▁  ▂▂▁      ▂█▇▄▂▂▃▄▄▃▂▂▂▁▁     ▁ ▁▁▃▄▃▂▃▃▂▁▂▁▁            ▂
-  █████████▆▃▃▃▃▁████████████████████████████████████▇▇▆▇▆▅▇▆▄▆ █
-  485 ns        Histogram: log(frequency) by time        638 ns &lt;
+  ▁▅███▇▄▂▂▁▁▂▂▄▄▄▅▄▃▃▁               ▂▃▄▃▃▃▂▂▃▃▃▂▁▂▂▂▃▁▁▁      ▃
+  ███████████████████████▆▆▅▁▆▇███▇█▇▇████████████████████▇██▇▇ █
+  483 ns        Histogram: log(frequency) by time        556 ns &lt;
 
  Memory estimate: 112 bytes, allocs estimate: 1.</code></pre><pre><code class="language-julia hljs">@benchmark orbitsolve(orb, t, PlanetOrbits.RootsMethod(Roots.AlefeldPotraShi()))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 10000 samples with 9 evaluations.
- Range (min … max):  2.322 μs …   9.545 μs  ┊ GC (min … max): 0.00% … 0.00%
- Time  (median):     2.545 μs               ┊ GC (median):    0.00%
- Time  (mean ± σ):   2.599 μs ± 243.630 ns  ┊ GC (mean ± σ):  0.00% ± 0.00%
+ Range (min … max):  2.356 μs …   5.067 μs  ┊ GC (min … max): 0.00% … 0.00%
+ Time  (median):     2.378 μs               ┊ GC (median):    0.00%
+ Time  (mean ± σ):   2.420 μs ± 104.409 ns  ┊ GC (mean ± σ):  0.00% ± 0.00%
 
-  ▃▅▁    ▁▆█▄▂▁      ▃▄▄    ▁                                 ▂
-  ███▇▆▅▁███████▅▄▄▆█████▇▅▆█▇▅▆▆▆▆▄▄▄▅▅▅▅▄▅▅▄▁▁▃▃▁▁▄▄▃▅▅▅▄▅▆ █
-  2.32 μs      Histogram: log(frequency) by time      3.76 μs &lt;
+  ▁▇ █▆ ▃ ▁▁                   ▁ ▄▄ ▃ ▃▂                      ▂
+  ██▁██▁█▁██▁█▁██▁▇▁▆▆▁▅▄▁▃▁▄▅▁█▁██▁█▁██▁██▁▇▁▄▅▁▅▁▄▇▁█▁▇▇▁▇▆ █
+  2.36 μs      Histogram: log(frequency) by time      2.76 μs &lt;
 
  Memory estimate: 112 bytes, allocs estimate: 1.</code></pre><h2 id="High-precision"><a class="docs-heading-anchor" href="#High-precision">High precision</a><a id="High-precision-1"></a><a class="docs-heading-anchor-permalink" href="#High-precision" title="Permalink"></a></h2><p>You can solve Kepler&#39;s equation in high precision using big floats and tightening the tolerance on the solver.</p><pre><code class="language-julia hljs">orb_big = orbit(a=big(1.2), e=big(0.1), M=big(1.0), ω=big(1.4), τ=big(0.5))
 sol = orbitsolve(orb_big, big(t), PlanetOrbits.RootsMethod(Roots.Thukral5B(),rtol=1e-30,atol=1e-30,))
-radvel(sol)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">18238.74783586164058110436412157446724913271569356796169848820891801965891606768</code></pre><h2 id="Comparison"><a class="docs-heading-anchor" href="#Comparison">Comparison</a><a id="Comparison-1"></a><a class="docs-heading-anchor-permalink" href="#Comparison" title="Permalink"></a></h2><p><img src="../assets/solver-accuracy.png" alt/> <img src="../assets/solver-speed.png" alt/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../conventions/">« Conventions</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.22 on <span class="colophon-date" title="Tuesday 23 August 2022 21:45">Tuesday 23 August 2022</span>. Using Julia version 1.7.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+radvel(sol)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">18238.74783586164058110436412157446724913271569356796169848820891801965891606768</code></pre><h2 id="Comparison"><a class="docs-heading-anchor" href="#Comparison">Comparison</a><a id="Comparison-1"></a><a class="docs-heading-anchor-permalink" href="#Comparison" title="Permalink"></a></h2><p><img src="../assets/solver-accuracy.png" alt/> <img src="../assets/solver-speed.png" alt/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../conventions/">« Conventions</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.22 on <span class="colophon-date" title="Thursday 25 August 2022 17:57">Thursday 25 August 2022</span>. Using Julia version 1.7.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
